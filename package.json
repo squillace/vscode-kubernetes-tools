@@ -44,6 +44,7 @@
         "onCommand:extension.vsKubernetesCreateCluster",
         "onCommand:extension.vsKubernetesDashboard",
         "onCommand:extension.vsKubernetesPortForward",
+        "onCommand:extension.vsKubernetesAddBinding",
         "onCommand:extension.helmTemplate",
         "onCommand:extension.helmTemplatePreview",
         "onCommand:extension.helmLint",
@@ -121,6 +122,12 @@
                     "when": "",
                     "command": "extension.helmInspectValues",
                     "group": "2_helm@98"
+                },
+                {
+                    "title": "Add External Service Binding",
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "extension.vsKubernetesAddBinding",
+                    "group": "2_svcat@99"
                 }
             ],
             "view/title": [
@@ -428,6 +435,11 @@
                 "category": "Kubernetes"
             },
             {
+                "command": "extension.vsKubernetesAddBinding",
+                "title": "Add External Service",
+                "category": "Service Catalog"
+            },
+            {
                 "command": "extension.vsKubernetesCopy",
                 "title": "Copy Name",
                 "category": "Kubernetes"
@@ -567,7 +579,9 @@
         "redhat.vscode-yaml"
     ],
     "dependencies": {
+        "@types/clipboardy": "^1.1.0",
         "@types/restify": "^5.0.7",
+        "@types/shelljs": "^0.7.8",
         "clipboardy": "^1.2.3",
         "compare-versions": "^3.1.0",
         "docker-file-parser": "^1.0.3",

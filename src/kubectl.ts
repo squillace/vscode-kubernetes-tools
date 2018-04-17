@@ -51,7 +51,7 @@ class KubectlImpl implements Kubectl {
     invokeAsyncWithProgress(command : string, progressMessage : string) : Promise<ShellResult> {
         return invokeAsyncWithProgress(this.context, command, progressMessage);
     }
-    invokeInTerminal(command : string, terminalName? : string) : void {
+    invokeInTerminal(command : string, terminalName? : string ) : void {
         const terminal = terminalName ? this.context.host.createTerminal(terminalName) : this.getSharedTerminal();
         return invokeInTerminal(this.context, command, terminal);
     }
