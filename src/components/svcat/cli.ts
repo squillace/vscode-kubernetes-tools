@@ -21,7 +21,8 @@ interface ServiceInstanceMap {
     [name: string] : ServiceInstance;
 }
 
-const kubectl = kubectlCreate(host, fs, shell);
+
+const kubectl = kubectlCreate(host, fs, shell,installDependenciesCallback);
 
 export const ServiceInstanceNames : string[] = [];
 export const ServiceInstanceArray : ServiceInstance[] = [];
