@@ -29,6 +29,15 @@ export interface ClusterConfig {
     readonly certificateAuthority: string;
 }
 
+export interface ObjectMeta {
+    readonly name: string;
+}
+
+export interface DataHolder {
+    readonly metadata: ObjectMeta;
+    readonly data: any;
+}
+
 async function getKubeconfig(kubectl: Kubectl): Promise<any> {
     const shellResult = await kubectl.invokeAsync("config view -o json");
     if (shellResult.code !== 0) {
@@ -94,6 +103,18 @@ export async function deleteCluster(kubectl: Kubectl, cluster: Cluster): Promise
     return true;
 }
 
+export async function getDataHolders(resource: string, kubectl: Kubectl): Promise<DataHolder[]> {
+    const currentNS = await currentNamespace(kubectl);
+
+    const shellResult = await kubectl.invokeAsync(`get ${resource} -o json --namespace=${currentNS}`);
+    if (shellResult.code !== 0) {
+        vscode.window.showErrorMessage(shellResult.stderr);
+        return [];
+    }
+    const depList = JSON.parse(shellResult.stdout);
+    return depList.items;
+}
+
 export async function getNamespaces(kubectl: Kubectl): Promise<Namespace[]> {
     const shellResult = await kubectl.invokeAsync("get namespaces -o json");
     if (shellResult.code !== 0) {
@@ -136,6 +157,10 @@ export async function getPodSelector(resource: string, kubectl: Kubectl): Promis
 }
 
 export async function getPods(kubectl: Kubectl, selector: any): Promise<Pod[]> {
+    if (!selector) {
+        return [];
+    }
+
     const currentNS = await currentNamespace(kubectl);
 
     const labels = [];
@@ -166,7 +191,7 @@ export async function getPods(kubectl: Kubectl, selector: any): Promise<Pod[]> {
     });
 }
 
-async function currentNamespace(kubectl: Kubectl): Promise<string> {
+export async function currentNamespace(kubectl: Kubectl): Promise<string> {
     const kubectlConfig = await getKubeconfig(kubectl);
     if (!kubectlConfig) {
         return "";
@@ -198,7 +223,7 @@ export async function switchNamespace(kubectl: Kubectl, namespace: string): Prom
 
 /**
  * Run the specified image in the kubernetes cluster.
- * 
+ *
  * @param kubectl the kubectl client.
  * @param deploymentName the deployment name.
  * @param image the docker image.
@@ -230,7 +255,7 @@ export async function runAsDeployment(kubectl: Kubectl, deploymentName: string, 
 
 /**
  * Query the pod list for the specified label.
- * 
+ *
  * @param kubectl the kubectl client.
  * @param labelQuery the query label.
  * @return the pod list.
@@ -249,7 +274,7 @@ export async function findPodsByLabel(kubectl: Kubectl, labelQuery: string): Pro
 
 /**
  * Wait and block until the specified pod's status becomes running.
- * 
+ *
  * @param kubectl the kubectl client.
  * @param podName the pod name.
  */
@@ -269,7 +294,7 @@ export async function waitForRunningPod(kubectl: Kubectl, podName: string): Prom
                 Pod logs:\n${logsResult.code === 0 ? logsResult.stdout : logsResult.stderr}`);
             throw new Error(`Failed to start the pod "${podName}". Its status is "${status}".`);
         }
-    
+
         await sleep(1000);
     }
 }

@@ -2,7 +2,7 @@
     "name": "vscode-kubernetes-tools",
     "displayName": "Kubernetes",
     "description": "Develop, deploy and debug Kubernetes applications",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "preview": true,
     "publisher": "ms-kubernetes-tools",
     "engines": {
@@ -45,6 +45,7 @@
         "onCommand:extension.vsKubernetesDashboard",
         "onCommand:extension.vsKubernetesPortForward",
         "onCommand:extension.vsKubernetesAddBinding",
+        "onCommand:extension.vsKubernetesDeleteFile",
         "onCommand:extension.helmTemplate",
         "onCommand:extension.helmTemplatePreview",
         "onCommand:extension.helmLint",
@@ -88,9 +89,21 @@
                             "type": "string",
                             "description": "File path to a draft binary."
                         },
+                        "vs-kubernetes.kubeconfig": {
+                            "type": "string",
+                            "description": "File path to the kubeconfig file."
+                        },
                         "vs-kubernetes.autoCleanupOnDebugTerminate": {
                             "type": "boolean",
                             "description": "Once the debug session is terminated, automatically clean up the created Deployment and associated Pod by the command \"Kubernetes: Debug (Launch)\"."
+                        },
+                        "vs-kubernetes.outputFormat": {
+                            "enum": [
+                                "json",
+                                "yaml"
+                            ],
+                            "type": "string",
+                            "description": "Output format for Kubernetes specs. One of 'json' or 'yaml' (default)."
                         }
                     },
                     "default": {
@@ -98,6 +111,8 @@
                         "vs-kubernetes.kubectl-path": "",
                         "vs-kubernetes.helm-path": "",
                         "vs-kubernetes.draft-path": "",
+                        "vs-kubernetes.outputFormat": "yaml",
+                        "vs-kubernetes.kubeconfig": "",
                         "vs-kubernetes.autoCleanupOnDebugTerminate": false
                     }
                 },
@@ -276,6 +291,11 @@
                     "command": "extension.vsKubernetesLogs",
                     "group": "3",
                     "when": "view == extension.vsKubernetesExplorer && viewItem == vsKubernetes.resource.pod"
+                },
+                {
+                    "command": "extension.vsKubernetesDeleteFile",
+                    "group": "3",
+                    "when": "view == extension.vsKubernetesExplorer && viewItem == vsKubernetes.file"
                 }
             ],
             "commandPalette": [
@@ -448,6 +468,11 @@
             {
                 "command": "extension.vsKubernetesCopy",
                 "title": "Copy Name",
+                "category": "Kubernetes"
+            },
+            {
+                "command": "extension.vsKubernetesDeleteFile",
+                "title": "Delete File",
                 "category": "Kubernetes"
             },
             {
@@ -685,6 +710,7 @@
         "dockerfile-parse": "^0.2.0",
         "download": "^6.2.5",
         "fuzzysearch": "^1.0.3",
+        "graceful-fs": "^4.1.11",
         "js-yaml": "^3.8.2",
         "k8s": "^0.4.12",
         "lodash": ">3",

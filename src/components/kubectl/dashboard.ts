@@ -20,7 +20,7 @@ const PROXY_OUTPUT_FILE = resolve(__dirname, 'proxy.out');
 const kubectl = kubectlCreate(host, fs, shell, installDependencies);
 
 // The instance of the terminal running Kubectl Dashboard
-let terminal:vscode.Terminal;
+let terminal: vscode.Terminal;
 
 /**
  * Determines if the selected cluster is AKS or not by examining
@@ -46,7 +46,7 @@ async function isAKSCluster (): Promise<boolean> {
     return true;
 }
 
-function _isNodeAKS (node) : boolean {
+function _isNodeAKS(node): boolean {
     const name: string = node.metadata.name;
     const roleLabel: string = node.metadata.labels["kubernetes.io/role"];
 
@@ -128,13 +128,9 @@ export async function dashboardKubernetes (): Promise<void> {
         {encoding: 'utf8'}
     ).on('data', onStreamData);
 
-    terminal = vscode.window.createTerminal(TERMINAL_NAME);
-    vscode.window.onDidCloseTerminal(onClosedTerminal);
-
     // stdout is also written to a file via `tee`. We read this file as a stream
     // to listen for when the server is ready.
-    terminal.sendText(`kubectl proxy | tee ${PROXY_OUTPUT_FILE}`);
-    terminal.show(true);
+    await kubectl.invokeInNewTerminal('proxy', TERMINAL_NAME, onClosedTerminal, `tee ${PROXY_OUTPUT_FILE}`);
 }
 
 /**

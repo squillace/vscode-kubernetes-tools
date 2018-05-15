@@ -61,7 +61,7 @@ export async function portForwardKubernetes (explorerNode?: any): Promise<void> 
         let podSelection;
 
         try {
-            const podNames:string[] = pods.map((podObj) => podObj.metadata.name);
+            const podNames: string[] = pods.map((podObj) => podObj.metadata.name);
             podSelection = await host.showQuickPick(
                 podNames,
                 { placeHolder: "Select a pod to port-forward to" }
@@ -166,7 +166,7 @@ export function buildPortMapping (portString: string): PortMapping {
  * Returns one or all available port-forwardable pods.
  * Checks the open document and returns a pod name, if it can find one.
  */
-async function findPortForwardablePods () : Promise<PortForwardFindPodsResult> {
+async function findPortForwardablePods (): Promise<PortForwardFindPodsResult> {
     let kindFromEditor = tryFindKindNameFromEditor();
     let kind, podName;
 
@@ -199,7 +199,7 @@ async function findPortForwardablePods () : Promise<PortForwardFindPodsResult> {
  * @param namespace  The namespace to use to find the pod in.
  * @returns The locally bound port that was used.
  */
-export async function portForwardToPod (podName: string, portMapping: PortMapping, namespace?: string) : Promise<number> {
+export async function portForwardToPod (podName: string, portMapping: PortMapping, namespace?: string): Promise<number> {
     const localPort = portMapping.localPort;
     const targetPort = portMapping.targetPort;
     let usedPort = localPort;
@@ -215,7 +215,7 @@ export async function portForwardToPod (podName: string, portMapping: PortMappin
 
     let usedNamespace = namespace === undefined ? 'default' : namespace;
 
-    kubectl.invokeInTerminal(`port-forward ${podName} ${usedPort}:${targetPort} -n ${usedNamespace}`, PORT_FORWARD_TERMINAL);
+    kubectl.invokeInNewTerminal(`port-forward ${podName} ${usedPort}:${targetPort} -n ${usedNamespace}`, PORT_FORWARD_TERMINAL);
     host.showInformationMessage(`Forwarding from 127.0.0.1:${usedPort} -> ${podName}:${targetPort}`);
 
     return usedPort;
